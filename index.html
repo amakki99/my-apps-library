@@ -959,9 +959,12 @@
         }
 
         function toggleSidebar() {
-            document.getElementById('sidebar').classList.toggle('collapsed');
-            if(window.innerWidth <= 768) {
+            if (window.innerWidth <= 768) {
+                // في شاشات الهواتف: نظهر القائمة الجانبية أو نخفيها
                 document.getElementById('sidebar').classList.toggle('mobile-open');
+            } else {
+                // في شاشات الكمبيوتر: نقوم بطي القائمة أو توسيعها
+                document.getElementById('sidebar').classList.toggle('collapsed');
             }
         }
 
