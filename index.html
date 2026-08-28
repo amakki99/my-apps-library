@@ -5,9 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>مكتبتي للتطبيقات</title>
     <style>
-        /* =========================================
-           إعدادات الخطوط والمتغيرات (CSS Variables)
-           ========================================= */
         @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap');
 
         :root {
@@ -47,7 +44,6 @@
             transition: var(--transition);
         }
 
-        /* اللوحة الجانبية */
         .sidebar {
             width: var(--sidebar-w);
             background: var(--surface-color);
@@ -74,7 +70,6 @@
         
         .sidebar-footer { padding: 15px; border-top: 1px solid var(--border); display: flex; gap: 10px; }
 
-        /* المحتوى الرئيسي */
         .main-content { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
         
         .header {
@@ -164,7 +159,6 @@
         }
         .form-control:focus { border-color: var(--primary); }
 
-        /* مشغل التطبيق */
         .player-modal { max-width: 96vw; height: 95vh; display: flex; flex-direction: column; padding: 0; }
         .player-header { padding: 12px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: var(--surface-color); }
         .player-frame { flex: 1; width: 100%; border: none; background: #fff; }
@@ -267,7 +261,6 @@
         </div>
     </main>
 
-    <!-- Modal إضافة/تعديل -->
     <div class="modal-overlay" id="addAppModal">
         <div class="modal">
             <div class="modal-header">
@@ -311,7 +304,6 @@
         </div>
     </div>
 
-    <!-- Modal مشغل التطبيق (مع توسيع صلاحيات التشغيل) -->
     <div class="modal-overlay" id="playerModal">
         <div class="modal player-modal">
             <div class="player-header">
@@ -321,12 +313,10 @@
                     <button class="btn btn-icon btn-outline" onclick="closePlayer()">✕</button>
                 </div>
             </div>
-            <!-- تم تزويد iframe بالصلاحيات الكاملة لتشغيل الطباعة، النوافذ المنبثقة، التنزيل والتخزين -->
             <iframe id="appFrame" class="player-frame" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals allow-downloads allow-popups-to-escape-sandbox"></iframe>
         </div>
     </div>
 
-    <!-- Modal إدارة التصنيفات -->
     <div class="modal-overlay" id="manageCategoriesModal">
         <div class="modal">
             <div class="modal-header">
@@ -341,7 +331,6 @@
         </div>
     </div>
 
-    <!-- Modal الإعدادات -->
     <div class="modal-overlay" id="settingsModal">
         <div class="modal">
             <div class="modal-header">
@@ -362,7 +351,6 @@
         </div>
     </div>
 
-    <!-- Modal الترحيب -->
     <div class="modal-overlay" id="welcomeModal">
         <div class="modal" style="text-align: center;">
             <h1 style="color: var(--primary); margin-bottom: 15px;">أهلاً بك في مكتبتي للتطبيقات! 🚀</h1>
@@ -730,7 +718,6 @@
             updateUI();
         }
 
-        /* --- آلية التشغيل المحسنة لحل مشكلة عدم عمل التطبيقات --- */
         let currentBlobUrl = null;
         
         async function playApp(id) {
@@ -745,11 +732,9 @@
             
             const frame = document.getElementById('appFrame');
             
-            // استخدام srcdoc مع fallback سلس لضمان تشغيل التطبيقات المحمية بـ localStorage والطباعة
             frame.removeAttribute('src');
             frame.srcdoc = app.content;
             
-            // زر الفتح في تبويب مستقل
             document.getElementById('newTabBtn').onclick = () => {
                 const blob = new Blob([app.content], { type: 'text/html;charset=utf-8' });
                 const blobUrl = URL.createObjectURL(blob);
@@ -810,19 +795,27 @@
             }
         }
 
+        // تم تحديث هذه الدالة لدعم الملفات الكبيرة
         function exportData() {
             const dataToExport = {
                 apps: apps,
                 categories: categories,
                 timestamp: Date.now()
             };
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(dataToExport));
+            
+            const jsonStr = JSON.stringify(dataToExport);
+            const blob = new Blob([jsonStr], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+            
             const downloadAnchorNode = document.createElement('a');
-            downloadAnchorNode.setAttribute("href", dataStr);
-            downloadAnchorNode.setAttribute("download", "app_library_backup.json");
+            downloadAnchorNode.setAttribute("href", url);
+            downloadAnchorNode.setAttribute("download", `app_library_backup_${new Date().getTime()}.json`);
             document.body.appendChild(downloadAnchorNode);
             downloadAnchorNode.click();
             downloadAnchorNode.remove();
+            
+            setTimeout(() => URL.revokeObjectURL(url), 100);
+            
             showToast('تم تصدير النسخة الاحتياطية بنجاح', 'success');
         }
 
